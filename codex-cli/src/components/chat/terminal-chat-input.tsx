@@ -928,7 +928,7 @@ function TerminalChatInputThinking({
   // requiring a double press for the normal single‑byte ESC events.
   // ---------------------------------------------------------------------
 
-  const { stdin, setRawMode } = useStdin();
+  const { stdin, setRawMode, isRawModeSupported } = useStdin();
 
   React.useEffect(() => {
     if (!active) {
@@ -937,7 +937,9 @@ function TerminalChatInputThinking({
 
     // Ensure raw mode – already enabled by Ink when the component has focus,
     // but called defensively in case that assumption ever changes.
-    setRawMode?.(true);
+    if (isRawModeSupported) {
+      setRawMode?.(true);
+    }
 
     const onData = (data: Buffer | string) => {
       if (awaitingConfirm) {
@@ -961,7 +963,7 @@ function TerminalChatInputThinking({
     return () => {
       stdin?.off("data", onData);
     };
-  }, [stdin, awaitingConfirm, onInterrupt, active, setRawMode]);
+  }, [stdin, awaitingConfirm, onInterrupt, active, setRawMode, isRawModeSupported]);
 
   // No local timer: the parent component supplies the elapsed time via props.
 

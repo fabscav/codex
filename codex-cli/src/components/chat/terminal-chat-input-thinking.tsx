@@ -24,14 +24,16 @@ export default function TerminalChatInputThinking({
     setDots((prev) => (prev.length < 3 ? prev + "." : ""));
   }, 500);
 
-  const { stdin, setRawMode } = useStdin();
+  const { stdin, isRawModeSupported, setRawMode } = useStdin();
 
   React.useEffect(() => {
     if (!active) {
       return;
     }
 
-    setRawMode?.(true);
+    if (isRawModeSupported) {
+      setRawMode?.(true);
+    }
 
     const onData = (data: Buffer | string) => {
       if (awaitingConfirm) {
@@ -52,7 +54,7 @@ export default function TerminalChatInputThinking({
     return () => {
       stdin?.off("data", onData);
     };
-  }, [stdin, awaitingConfirm, onInterrupt, active, setRawMode]);
+  }, [stdin, awaitingConfirm, onInterrupt, active, setRawMode, isRawModeSupported]);
 
   // No timers required beyond tracking the elapsed seconds supplied via props.
 
